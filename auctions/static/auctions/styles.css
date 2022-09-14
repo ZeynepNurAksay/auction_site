@@ -1,0 +1,16 @@
+body {
+    padding: 10px;
+}
+
+img {
+    height: 200px;
+}
+
+.message{
+    color: red;
+}
+
+#listingLink{
+    text-decoration: none;
+    color: black;
+}

@@ -1,0 +1,54 @@
+{% extends 'auctions/layout.html' %}
+
+{% block title %}
+    Watchlist
+{% endblock %} 
+
+{% block body %}
+
+<div class="container mb-5">
+    <div class="row">
+      <div class="col-lg-12 mb-5">
+        <a href="{% url 'active_watchlist' %}"> Active Listings</a> |
+        <a href="{% url 'ended_watchlist' %}"> Ended Listings</a>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-12 mb-5">
+        <h1>Your Watchlist</h1>
+      </div>
+    </div>
+    
+    <div class="row">
+      {% for item in items %} 
+        <div class="col-lg-4 mb-5">
+          <div class="card h-100">
+            <a href="{% url 'listingPage' item.id %}" id="listingLink">
+              <div class="card-body d-flex flex-column">
+                {% if item.image %} 
+                  <img src="{{ item.image}}" alt="Item Image">
+                {% endif %} 
+                <h2>{{item.title}}</h2>
+                <p>{{ item.description }}</p>
+                <p>
+                  Current Price:
+                  <h1 style="line-height: 20%">£{{item.starting_bid|floatformat:2}}</h1>
+                </p>
+                {% if not item.is_active %}
+                  <div class="alert alert-danger" role="alert">
+                    Auction ended!
+                  </div>
+                {% else %}
+                  <p>{{ now|timesince:item.auction_end_date }} left</p>
+                {% endif %} 
+                
+              </div>
+            </a>
+            
+          </div>
+        </div>
+      {% endfor %} 
+    </div>
+    </div> 
+{% endblock %}

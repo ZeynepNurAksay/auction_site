@@ -1,0 +1,130 @@
+{% extends 'auctions/layout.html' %}
+{% block title %}
+ Listing page 
+{% endblock %} 
+
+{% block body %}
+
+    {% if message %}
+        <p class="message">{{ message }}</p>
+    {% endif %}
+    {% if not expired and user_wins %}
+        <div class="alert alert-success" role="alert">
+            Congrats! You won this auction!
+        </div>
+    {% endif %}
+
+    {% if item.image %}
+        <img src="{{ item.image}}" alt="Item Image" style="float: left; margin-right:10%; margin-left:5%; width: 30%; height: 30%;">
+    {% endif %}
+    <div style="width: 50%; float: left; margin-bottom: 30px;">
+        <h1>{{item.title}}</h1>
+    Seller: {{item.user}}
+    {% if item.category %}
+        <p>Category: {{item.category}}</p>
+    {% endif %}
+    <p>Description: {{item.description}}</p>
+    <p>
+        Current Price:
+        <h1 style="line-height: 20%">£{{item.starting_bid|floatformat:2}}</h1>
+        {% if recently_created %}
+            0 bids
+        {% elif expired and user_wins  and item.user != request.user %}
+            {{bids | add:"-1"}} bids | Your bid is the current bid!
+        {% else %}
+            {{bids| add:"-1"}} bids
+        {% endif %}
+    </p>
+    {% if item.user != request.user %}
+        {% if expired %}
+        <form action="{% url 'bid_on' item.id %}" method="post">
+            {% csrf_token %}
+            <input type="number" step="0.1" name="bid">
+            <input class="btn btn-primary" type="submit" value="Submit Bid">
+        </form>
+        {% endif %}
+        
+    {% endif %}
+    
+    <br>
+    {% if not expired %}
+        {% if item.user == request.user %}
+            <div class="alert alert-danger" role="alert">
+                You ended the auction!
+            </div>
+        {% else %}
+            <div class="alert alert-danger" role="alert">
+                Auction ended!
+            </div>
+        {% endif %}
+    {% else %}
+        <p>{{ now|timesince:item.auction_end_date }} left</p>
+    {% endif %} 
+
+    {% if item.user == request.user %}
+    
+
+    {% if expired %}
+        <div class="alert alert-info" role="alert">
+            This item is your listing! You can end the auction now!
+        </div>
+        <a href="{% url 'end_auction' item.id %}"><button class="btn btn-danger">End Auction</button></a>
+    {% endif %}
+        
+    {% endif %}
+    
+    {% if item.user != request.user %}
+        {% if in_watchlist %}
+            <a href="{% url 'removeItem' item.id %}"><button class="btn btn-danger">Remove from Watchlist</button></a>
+        {% else %}
+            <a href="{% url 'addItem' item.id %}"><button class="btn btn-secondary">Add to Watchlist</button></a>
+        {% endif %}
+        
+    {% endif %}
+
+    
+
+    </div>
+
+    <div style="width: 100%; float: left">
+
+        {% if item.user != request.user and expired%}
+            <form action="{% url 'comment' item.id %}" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="comment"><b>Comment:</b></label>
+                    <br>
+                    <textarea name="comment" id="comment" class="form-control"></textarea>
+                    <br>
+                    <input class="btn btn-primary" type="submit" value="Comment">
+                </div>
+        
+            </form>
+        
+        {% endif %}
+
+        <b>Comments</b>
+
+        {% for comment in comments %} 
+        <div class="card h-100">
+            {% if comment.user == request.user %}
+                <b>You</b>
+            {% else %}
+                <b>{{comment.user}}</b>
+            {% endif %}
+            
+            {{comment.comment}}
+            
+          </div>
+
+          <br>
+            
+        {% endfor %}
+
+    </div>
+
+    
+    
+    
+
+{% endblock %}
